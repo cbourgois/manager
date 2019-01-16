@@ -22,7 +22,8 @@
     "test": "yarn lint && yarn run test:e2e",
     "test:e2e": "lerna run test:e2e --stream --concurrency=1",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
-    "release": "node ./scripts/release"
+    "release": "node ./scripts/release",
+    "split": "node ./scripts/split"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.1.1",
