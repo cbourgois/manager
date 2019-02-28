@@ -43,6 +43,20 @@ angular.module("ovh-api-services").service("OvhApiKubeV6", function ($resource, 
             url: "/kube/:serviceName/serviceInfos",
             method: "PUT",
             interceptor: interceptor
+        },
+        updateVersion: {
+            url: "/kube/:serviceName/update",
+            method: "POST",
+            interceptor: interceptor
+        },
+        updatePolicy: {
+            url: "/kube/:serviceName/updatePolicy",
+            method: "PUT",
+            interceptor: interceptor
+        },
+        getSchema: {
+            url: "/kube.json",
+            method: "GET"
         }
     });
 

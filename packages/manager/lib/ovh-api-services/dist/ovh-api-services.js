@@ -1,4 +1,4 @@
-angular.module("ovh-api-services", ["ovh-angular-apiv7"]);
+angular.module("ovh-api-services", ["ngOvhApiv7"]);
 
 angular.module("ovh-api-services").service("OvhApiAuth", ["$injector", function ($injector) {
     "use strict";
@@ -94,6 +94,10 @@ angular.module("ovh-api-services").service("OvhApiCdnDedicatedV6", ["$resource",
             method: "GET",
             url: "/cdn/dedicated/:serviceName/quota",
             isArray: true
+        },
+        logs: {
+            method: "POST",
+            url: "/cdn/dedicated/:serviceName/logs"
         },
         swsGetStatistics: {
             method: "GET",
@@ -196,6 +200,10 @@ angular.module("ovh-api-services").service("OvhApiCdnDedicatedDomainsV6", ["$res
         flush: {
             method: "POST",
             url: "/cdn/dedicated/:serviceName/domains/:domain/flush"
+        },
+        logs: {
+            method: "POST",
+            url: "/cdn/dedicated/:serviceName/domains/:domain/logs"
         },
         statistics: {
             method: "GET",
@@ -5351,6 +5359,9 @@ angular.module("ovh-api-services").service("OvhApiDedicatedCloudDatacenter", ["$
         },
         Backup: function () {
             return $injector.get("OvhApiDedicatedCloudDatacenterBackup");
+        },
+        Zerto: function () {
+            return $injector.get("OvhApiDedicatedCloudDatacenterZerto");
         }
     };
 
@@ -5546,6 +5557,99 @@ angular.module("ovh-api-services").service("OvhApiDedicatedCloudDatacenterHostV6
     };
 
     return hostResource;
+}]);
+
+angular.module("ovh-api-services").service("OvhApiDedicatedCloudDatacenterZerto", ["$injector", function ($injector) {
+    "use strict";
+
+    return {
+        v6: function () {
+            return $injector.get("OvhApiDedicatedCloudDatacenterZertoV6");
+        },
+        Single: function () {
+            return $injector.get("OvhApiDedicatedCloudDatacenterZertoSingle");
+        }
+    };
+}]);
+
+angular.module("ovh-api-services").service("OvhApiDedicatedCloudDatacenterZertoV6", ["$cacheFactory", "$resource", function ($cacheFactory, $resource) {
+    "use strict";
+
+    var cache = $cacheFactory("OvhApiDedicatedCloudDatacenterZertoV6");
+    var interceptor = {
+        response: function (response) {
+            cache.removeAll();
+            return response;
+        }
+    };
+
+    var zertoResource = $resource("/dedicatedCloud/:serviceName/datacenter/:datacenterId/disasterRecovery/zerto", {
+        serviceName: "@serviceName",
+        datacenterId: "@datacenterId"
+    }, {
+        disable: {
+            url: "/dedicatedCloud/:serviceName/datacenter/:datacenterId/disasterRecovery/zerto/disable",
+            method: "POST",
+            interceptor: interceptor
+        },
+        enable: {
+            url: "/dedicatedCloud/:serviceName/datacenter/:datacenterId/disasterRecovery/zerto/enable",
+            method: "POST",
+            interceptor: interceptor
+        },
+        generateZsspPassword: {
+            url: "/dedicatedCloud/:serviceName/datacenter/:datacenterId/disasterRecovery/zerto/generateZsspPassword",
+            method: "POST",
+            interceptor: interceptor
+        },
+        state: {
+            url: "/dedicatedCloud/:serviceName/datacenter/:datacenterId/disasterRecovery/zerto/state",
+            method: "POST",
+            interceptor: interceptor
+        }
+    });
+
+    return zertoResource;
+}]);
+
+angular.module("ovh-api-services").service("OvhApiDedicatedCloudDatacenterZertoSingle", ["$injector", function ($injector) {
+    "use strict";
+
+    return {
+        v6: function () {
+            return $injector.get("OvhApiDedicatedCloudDatacenterZertoSingleV6");
+        }
+    };
+}]);
+
+angular.module("ovh-api-services").service("OvhApiDedicatedCloudDatacenterZertoSingleV6", ["$cacheFactory", "$resource", function ($cacheFactory, $resource) {
+    "use strict";
+
+    var cache = $cacheFactory("OvhApiDedicatedCloudDatacenterZertoSingleV6");
+    var interceptor = {
+        response: function (response) {
+            cache.removeAll();
+            return response;
+        }
+    };
+
+    var zertoSingleResource = $resource("/dedicatedCloud/:serviceName/datacenter/:datacenterId/disasterRecovery/zertoSingle", {
+        serviceName: "@serviceName",
+        datacenterId: "@datacenterId"
+    }, {
+        disable: {
+            url: "/dedicatedCloud/:serviceName/datacenter/:datacenterId/disasterRecovery/zertoSingle/disable",
+            method: "POST",
+            interceptor: interceptor
+        },
+        enable: {
+            url: "/dedicatedCloud/:serviceName/datacenter/:datacenterId/disasterRecovery/zertoSingle/enable",
+            method: "POST",
+            interceptor: interceptor
+        }
+    });
+
+    return zertoSingleResource;
 }]);
 
 angular.module("ovh-api-services").service("OvhApiDedicatedCloud", ["$injector", function ($injector) {
@@ -5786,6 +5890,9 @@ angular.module("ovh-api-services").service("OvhApiDedicatedCloudIp", ["$injector
     return {
         v6: function () {
             return $injector.get("OvhApiDedicatedCloudIpV6");
+        },
+        Details: function () {
+            return $injector.get("OvhApiDedicatedCloudIpDetails");
         }
     };
 
@@ -5814,6 +5921,34 @@ angular.module("ovh-api-services").service("OvhApiDedicatedCloudIpV6", ["$resour
     };
 
     return ipResource;
+}]);
+
+angular.module("ovh-api-services").service("OvhApiDedicatedCloudIpDetailsV6", ["$cacheFactory", "$resource", function ($cacheFactory, $resource) {
+    "use strict";
+    var cache = $cacheFactory("OvhApiDedicatedCloudIpDetailsV6");
+
+    var ipDetailsResource = $resource("/dedicatedCloud/:serviceName/ip/:network/details", {
+        serviceName: "@serviceName",
+        network: "@network"
+    }, {
+        get: { method: "GET", cache: cache, isArray: true }
+    });
+
+    ipDetailsResource.resetCache = function () {
+        cache.removeAll();
+    };
+
+    return ipDetailsResource;
+}]);
+
+angular.module("ovh-api-services").service("OvhApiDedicatedCloudIpDetails", ["$injector", function ($injector) {
+    "use strict";
+
+    return {
+        v6: function () {
+            return $injector.get("OvhApiDedicatedCloudIpDetailsV6");
+        }
+    };
 }]);
 
 angular.module("ovh-api-services").service("OvhApiDedicatedCloudLocation", ["$injector", function ($injector) {
@@ -6652,6 +6787,43 @@ angular.module("ovh-api-services").service("OvhApiDomainV7", ["apiv7", function 
 
     return domainEndpoint;
 }]);
+
+angular
+    .module("ovh-api-services")
+    .service(
+        "OvhApiEmailDomain",
+        ["$injector", function ($injector) {
+            "use strict";
+
+            return {
+                v6: function () {
+                    return $injector.get("OvhApiEmailDomainV6");
+                }
+            };
+        }]);
+
+angular
+    .module("ovh-api-services")
+    .service("OvhApiEmailDomainV6", ["$resource", "$cacheFactory", function ($resource, $cacheFactory) {
+        "use strict";
+        var cache = $cacheFactory("OvhApiEmailDomainV6");
+        var domainResource = $resource("/email/domain/:serviceName", {
+            serviceName: "@serviceName"
+        }, {
+            get: { method: "GET", cache: cache },
+            serviceInfos: { method: "GET", url: "/email/domain/:serviceName/serviceInfos" }
+        });
+
+        domainResource.resetAllCache = function () {
+            domainResource.resetCache();
+        };
+
+        domainResource.resetCache = function () {
+            cache.removeAll();
+        };
+
+        return domainResource;
+    }]);
 
 angular.module("ovh-api-services").service("OvhApiEmailExchange", ["$injector", function ($injector) {
     "use strict";
@@ -7926,6 +8098,20 @@ angular.module("ovh-api-services").service("OvhApiKubeV6", ["$resource", "$cache
             url: "/kube/:serviceName/serviceInfos",
             method: "PUT",
             interceptor: interceptor
+        },
+        updateVersion: {
+            url: "/kube/:serviceName/update",
+            method: "POST",
+            interceptor: interceptor
+        },
+        updatePolicy: {
+            url: "/kube/:serviceName/updatePolicy",
+            method: "PUT",
+            interceptor: interceptor
+        },
+        getSchema: {
+            url: "/kube.json",
+            method: "GET"
         }
     });
 
@@ -11218,62 +11404,6 @@ angular.module("ovh-api-services").service("OvhApiOrderCartProductV6", ["$resour
     return orderCartProduct;
 }]);
 
-angular.module("ovh-api-services").service("OvhApiOrderCartServiceOption", ["$injector", function ($injector) {
-
-    "use strict";
-    return {
-        v6: function () {
-            return $injector.get("OvhApiOrderCartServiceOptionV6");
-        }
-    };
-}]);
-
-angular.module("ovh-api-services").service("OvhApiOrderCartServiceOptionV6", ["$resource", "$cacheFactory", function ($resource, $cacheFactory) {
-
-    "use strict";
-
-    // Cache to invalidate
-    var queryCache = $cacheFactory("OvhApiOrderCartServiceOptionV6Query");
-    var cache = $cacheFactory("OvhApiOrderCartServiceOptionV6");
-
-    var interceptor = {
-        response: function (response) {
-            orderCartServiceOption.resetQueryCache();
-            return response.data;
-        }
-    };
-
-    var orderCartServiceOption = $resource("/order/cartServiceOption/:productName/:serviceName", {
-        productName: "@productName",
-        serviceName: "@serviceName"
-    }, {
-        get: { method: "GET", cache: cache, isArray: true },
-        post: { method: "POST", interceptor: interceptor }
-    });
-
-    orderCartServiceOption.resetCache = function () {
-        cache.removeAll();
-    };
-
-    orderCartServiceOption.resetQueryCache = function () {
-        queryCache.removeAll();
-    };
-
-    return orderCartServiceOption;
-}]);
-
-angular.module("ovh-api-services").service("OvhApiOrderCartServiceOption", ["$injector", function ($injector) {
-    "use strict";
-    return {
-        Microsoft: function () {
-            return $injector.get("OvhApiOrderCartServiceOptionMicrosoft");
-        },
-        MicrosoftExchange: function () {
-            return $injector.get("OvhApiOrderCartServiceOptionMicrosoftExchange");
-        }
-    };
-}]);
-
 angular.module("ovh-api-services").service("OvhApiOrderCartServiceOptionMicrosoft", ["$injector", function ($injector) {
     "use strict";
     return {
@@ -11392,6 +11522,82 @@ angular
         };
 
         return resource;
+    }]);
+
+angular.module("ovh-api-services").service("OvhApiOrderCartServiceOption", ["$injector", function ($injector) {
+
+    "use strict";
+    return {
+        Microsoft: function () {
+            return $injector.get("OvhApiOrderCartServiceOptionMicrosoft");
+        },
+        MicrosoftExchange: function () {
+            return $injector.get("OvhApiOrderCartServiceOptionMicrosoftExchange");
+        },
+        Vps: function () {
+            return $injector.get("OvhApiOrderCartServiceOptionVps");
+        },
+        v6: function () {
+            return $injector.get("OvhApiOrderCartServiceOptionV6");
+        }
+    };
+}]);
+
+angular.module("ovh-api-services").service("OvhApiOrderCartServiceOptionV6", ["$resource", "$cacheFactory", function ($resource, $cacheFactory) {
+
+    "use strict";
+
+    // Cache to invalidate
+    var queryCache = $cacheFactory("OvhApiOrderCartServiceOptionV6Query");
+    var cache = $cacheFactory("OvhApiOrderCartServiceOptionV6");
+
+    var interceptor = {
+        response: function (response) {
+            orderCartServiceOption.resetQueryCache();
+            return response.data;
+        }
+    };
+
+    var orderCartServiceOption = $resource("/order/cartServiceOption/:productName/:serviceName", {
+        productName: "@productName",
+        serviceName: "@serviceName"
+    }, {
+        get: { method: "GET", cache: cache, isArray: true },
+        post: { method: "POST", interceptor: interceptor }
+    });
+
+    orderCartServiceOption.resetCache = function () {
+        cache.removeAll();
+    };
+
+    orderCartServiceOption.resetQueryCache = function () {
+        queryCache.removeAll();
+    };
+
+    return orderCartServiceOption;
+}]);
+
+angular.module("ovh-api-services").service("OvhApiOrderCartServiceOptionVps", ["$injector", function ($injector) {
+    "use strict";
+    return {
+        v6: function () {
+            return $injector.get("OvhApiOrderCartServiceOptionVpsV6");
+        }
+    };
+}]);
+
+angular
+    .module("ovh-api-services")
+    .service("OvhApiOrderCartServiceOptionVpsV6", ["$resource", function ($resource) {
+        "use strict";
+
+        return $resource("/order/cartServiceOption/vps/:serviceName", {
+            serviceName: "@serviceName"
+        }, {
+            get: {
+                isArray: true
+            }
+        });
     }]);
 
 angular.module("ovh-api-services").service("OvhApiOrderCatalogFormatted", ["$injector", function ($injector) {
@@ -12200,8 +12406,39 @@ angular
         return {
             MicrosoftExchange: function () {
                 return $injector.get("OvhApiOrderUpgradeMicrosoftExchange");
+            },
+            Vps: function () {
+                return $injector.get("OvhApiOrderVps");
             }
         };
+    }]);
+
+angular
+    .module("ovh-api-services")
+    .service("OvhApiOrderVps", ["$injector", function ($injector) {
+
+        "use strict";
+        return {
+            v6: function () {
+                return $injector.get("OvhApiOrderVpsV6");
+            }
+        };
+    }]);
+
+angular
+    .module("ovh-api-services")
+    .service("OvhApiOrderVpsV6", ["$resource", function ($resource) {
+        "use strict";
+
+        return $resource("/order/upgrade/vps/:serviceName/:planCode", {
+            serviceName: "@serviceName",
+            planCode: "@planCode"
+        }, {
+            getAvailableOffers: {
+                method: "GET",
+                isArray: true
+            }
+        });
     }]);
 
 angular.module("ovh-api-services").service("OvhApiOrderVrackNew", ["$injector", function ($injector) {
@@ -22089,6 +22326,15 @@ angular.module("ovh-api-services").service("OvhApiVpsV6", ["$resource", "$cacheF
             period: "@period",
             type: "@type",
             cache: cache
+        },
+        availableUpgrade: {
+            url: "/vps/:serviceName/availableUpgrade",
+            method: "GET",
+            isArray: true
+        },
+        version: {
+            url: "/vps/:serviceName/version",
+            method: "GET"
         }
     });
 
