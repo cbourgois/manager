@@ -6,21 +6,23 @@ export default class CloudProjectCtrl {
     $state,
     $stateParams,
     $transitions,
-    ControllerHelper,
+    CucCucControllerHelper,
     ovhUserPref,
     OvhApiCloud,
     CloudProjectRightService,
+    TAREGT,
   ) {
     this.serviceName = $stateParams.projectId;
     this.onboardingKey = 'SHOW_PCI_ONBOARDING';
 
     this.$transitions = $transitions;
 
-    this.ControllerHelper = ControllerHelper;
+    this.CucControllerHelper = CucControllerHelper;
     this.ovhUserPref = ovhUserPref;
     this.OvhApiCloud = OvhApiCloud;
     this.CloudProjectRightService = CloudProjectRightService;
 
+    $scope.TARGET = TARGET;
 
     this.loaders = {
       project: false,
@@ -47,7 +49,7 @@ export default class CloudProjectCtrl {
   }
 
   openOnboarding() {
-    this.ControllerHelper.modal.showModal({
+    this.CucControllerHelper.modal.showModal({
       modalConfig: {
         templateUrl: 'app/cloud/project/onboarding/onboarding-pci.html',
         controller: 'pciSlideshowCtrl',
